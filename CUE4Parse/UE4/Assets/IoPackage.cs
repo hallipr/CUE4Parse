@@ -22,7 +22,7 @@ namespace CUE4Parse.UE4.Assets
     public sealed class IoPackage : AbstractUePackage
     {
         private readonly IoGlobalData _globalData;
-
+        public static string[] IgnoredExportTypes = [];
         public override FPackageFileSummary Summary { get; }
         public override FNameEntrySerialized[] NameMap { get; }
         public override int ImportMapLength => ImportMap.Length;
@@ -255,7 +255,8 @@ namespace CUE4Parse.UE4.Assets
                     var Ar = (FAssetArchive) uassetAr.Clone();
                     Ar.AbsoluteOffset = newPos ? cookedHeaderSize - allExportDataOffset : (int) export.CookedSerialOffset - pos;
                     Ar.Position = pos;
-                    DeserializeObject(obj, Ar, (long) export.CookedSerialSize);
+                    if(!IgnoredExportTypes.Contains(obj.ExportType))
+                        DeserializeObject(obj, Ar, (long) export.CookedSerialSize);
                     // TODO right place ???
                     obj.Flags |= EObjectFlags.RF_LoadCompleted;
                     obj.PostLoad();
